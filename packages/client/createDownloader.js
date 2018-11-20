@@ -6,8 +6,13 @@ module.exports = connection => {
     const opts = {
       host,
       port,
-      path: `/args=${JSON.stringify({ name, segs })}`
+      path: `/?args=${encodeURIComponent(JSON.stringify({ name, segs }))}`
     };
+    console.log({
+      ...ssl,
+      rejectUnauthorized: false,
+      ...opts
+    });
     if (ssl) {
       require("https").get(
         {

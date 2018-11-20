@@ -44,11 +44,12 @@ class Watcher extends EventEmitter {
   getState() {
     return this.state;
   }
-  resovleFile(name, segs) {
+  resolveFile(name, segs) {
     if (this.names.indexOf(name) === -1) {
       throw new Error(`no target ${name}`);
     }
-    return path.join(this.targets[name], this.joinSegs(segs));
+    const config = this.targets[name];
+    return path.join(config.target, this.joinSegs(segs));
   }
   joinSegs(segs) {
     return segs.join(path.sep);

@@ -4,9 +4,10 @@ const fs = require("fs");
 module.exports = watcher => {
   return (req, res) => {
     const { args } = url.parse(req.url, true).query;
+    console.log(args);
     try {
       const { name, segs } = JSON.parse(args);
-      const file = watcher.resovleFile(name, segs);
+      const file = watcher.resolveFile(name, segs);
       fs.readFile(file, (err, data) => {
         if (err) {
           throw err;
