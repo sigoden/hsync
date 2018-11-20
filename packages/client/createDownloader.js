@@ -9,11 +9,9 @@ module.exports = connection => {
       path: `/args=${JSON.stringify({ name, segs })}`
     };
     if (ssl) {
-      const { cert, key } = ssl;
       require("https").get(
         {
-          cert,
-          key,
+          ...ssl,
           rejectUnauthorized: false,
           ...opts
         },

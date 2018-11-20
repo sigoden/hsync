@@ -1,13 +1,12 @@
 #!/bin/bash
 set -e -u
 
-if [[ "$#" -ne 2 ]]; then
-    echo 'Usage: mkcert <FQDN> <output>'
+if [[ "$#" -ne 1 ]]; then
+    echo 'Usage: mkcert <output>'
     exit
 fi
 
-FQDN=$1
-ROOT=$(realpath $2)
+ROOT=$(realpath $1)
 mkdir -p $ROOT
 
 # Create your very own Root Certificate Authority
@@ -24,7 +23,7 @@ openssl req \
   -key $ROOT/ca.key \
   -days 3652 \
   -out $ROOT/ca.crt \
-  -subj "/C=US/ST=Utah/L=Provo/O=ACME Signing Authority Inc/CN=${FQDN}"
+  -subj "/C=US/ST=Utah/L=Provo/O=ACME Signing Authority Inc/CN=ca"
 
 
 
@@ -39,7 +38,7 @@ openssl genrsa \
 openssl req -new \
   -key $ROOT/server.key \
   -out $ROOT/server.csr \
-  -subj "/C=US/ST=Utah/L=Provo/O=ACME Service/CN=${FQDN}"
+  -subj "/C=US/ST=Utah/L=Provo/O=ACME Service/CN=ca"
 
 openssl x509 \
   -req -in $ROOT/server.csr \
@@ -57,7 +56,7 @@ openssl genrsa \
 openssl req -new \
   -key $ROOT/client.key \
   -out $ROOT/client.csr \
-  -subj "/C=US/ST=Utah/L=Provo/O=ACME App Client/CN=${FQDN}"
+  -subj "/C=US/ST=Utah/L=Provo/O=ACME App Client/CN=ca"
 
 # Sign the request from Trusted Client with your Root CA
 openssl x509 \

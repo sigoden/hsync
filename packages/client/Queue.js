@@ -5,19 +5,19 @@ const rimraf = require("rimraf");
 const { EventEmitter } = require("events");
 
 class Queue extends EventEmitter {
-  constructor(targets, downloader) {
+  constructor(name, config, downloader) {
     super();
-    this.targets = targets;
+    this.name = name;
+    this.config = config;
     this.downloader = downloader;
     this.queue = [];
     this.index = 0;
   }
   syncState(state) {
-    this.queue = [];
     this.index = 0;
-    state2ChangeList(state).forEach(change =>
-      this.queue.push(this._mapChange(change))
-    );
+    const raws = [];
+    iterate(raws, [], state);
+    this.queue = raws.map(v => this._mapFn(v));
     this._next();
   }
   joinSegs(segs) {
@@ -27,8 +27,7 @@ class Queue extends EventEmitter {
     return p.slice(0, parentDir.length) === parentDir;
   }
   add(change) {
-    const mappedChange = this._mapChange(change);
-    this.queue.push(mappedChange);
+    const mappedChange = this._mapFn(change);
     if (change.action === "unlinkDir") {
       this.queue.slice(this.index).forEach(v => {
         if (this._isParentDir(v.absPath, mappedChange.absPath)) {
@@ -36,6 +35,7 @@ class Queue extends EventEmitter {
         }
       });
     }
+    this.queue.push(mappedChange);
     if (!this.running) {
       this._next();
     }
@@ -46,22 +46,22 @@ class Queue extends EventEmitter {
       return;
     }
     const change = this.queue[this.index];
-    this.index++;
     change.exec(err => {
+      this.queue[this.index] = undefined;
+      this.index++;
       if (err) {
         this.emit(err);
       }
       this._next();
     });
   }
-  _absPath(name, segs) {
-    return path.join(this.targets[name].target, this.joinSegs(segs));
+  _absPath(segs) {
+    return path.join(this.config.target, this.joinSegs(segs));
   }
-  _mapChange(change) {
-    const { name, action, segs, info } = change;
-    const absPath = this._absPath(name, segs);
-    change.absPath = absPath;
-    change.exec = cb => {
+  _mapFn(change) {
+    const { action, segs, info } = change;
+    const absPath = this._absPath(segs);
+    const exec = cb => {
       switch (action) {
         case "addDir":
           mkdirp(absPath, cb);
@@ -72,7 +72,7 @@ class Queue extends EventEmitter {
           break;
         case "change":
         case "add":
-          this.downloader(name, segs, function(res) {
+          this.downloader(this.name, segs, function(res) {
             let raw = "";
             res.on("error", err => cb(err));
             res.on("data", chunk => {
@@ -84,26 +84,18 @@ class Queue extends EventEmitter {
           });
       }
     };
-    return change;
+    return { action, segs, info, absPath, exec };
   }
 }
 
-function state2ChangeList(state) {
-  const result = [];
-  Object.keys(state).forEach(name => {
-    iterate(result, name, [], state[name]);
-  });
-  return result;
-}
-
-function iterate(list, name, paths, obj) {
+function iterate(list, paths, obj) {
   if (obj.children) {
-    list.push({ name, action: "addDir", segs: paths, info: obj.info });
+    list.push({ action: "addDir", segs: paths, info: obj.info });
     Object.keys(obj.children).forEach(sub => {
-      iterate(list, name, paths.concat([sub]), obj.children[sub]);
+      iterate(list, paths.concat([sub]), obj.children[sub]);
     });
   } else {
-    list.push({ name, action: "add", segs: paths, info: obj.info });
+    list.push({ action: "add", segs: paths, info: obj.info });
   }
 }
 
