@@ -10,22 +10,23 @@ module.exports = config => {
   const server = createServer(config.connection, createHandler(watcher));
   const io = require("socket.io")(server, { serveClient: false });
 
+  watcher.on("change", change => {
+    const { name, action, segs } = change;
+    debug(`[${name}]: ${action} ${watcher.joinSegs(segs)}`);
+    io.to(name).emit("change", change);
+  });
+
   io.on("connection", function(socket) {
     socket.on("init", names => {
       try {
         watcher.checkNames(names);
-        socket.emit("sync", pick_(watcher.getState(), names));
         for (const name of names) {
           socket.join(name);
         }
       } catch (err) {
         socket.emit("error", err);
       }
-    });
-    watcher.on("change", change => {
-      const { name, action, segs } = change;
-      debug(`${action}: ${name}|${watcher.joinSegs(segs)}`);
-      io.to(name).emit("change", change);
+      socket.emit("sync", pick_(watcher.getState(), names));
     });
   });
 

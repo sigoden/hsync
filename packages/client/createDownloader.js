@@ -1,17 +1,20 @@
+const fs = require("fs");
+
 module.exports = connection => {
   const { host, port, ssl } = connection;
-  return (name, rp, cb) => {
+  return (name, segs, cb) => {
     const opts = {
       host,
       port,
-      path: `/name=${name}&rp=${rp}`
+      path: `/args=${JSON.stringify({ name, segs })}`
     };
     if (ssl) {
-      const { cert, key } = ca;
+      const { cert, key } = ssl;
       require("https").get(
         {
           cert,
           key,
+          rejectUnauthorized: false,
           ...opts
         },
         cb

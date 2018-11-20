@@ -10,6 +10,9 @@
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
   "license": "MIT",
   "dependencies": {
+    "debug": "^4.1.0",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.2",
     "socket.io-client": "^2.1.1"
   }
 }
