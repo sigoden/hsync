@@ -8,18 +8,9 @@ module.exports = connection => {
       port,
       path: `/?args=${encodeURIComponent(JSON.stringify({ name, segs }))}`
     };
-    console.log({
-      ...ssl,
-      rejectUnauthorized: false,
-      ...opts
-    });
     if (ssl) {
       require("https").get(
-        {
-          ...ssl,
-          rejectUnauthorized: false,
-          ...opts
-        },
+        Object.assign({ rejectUnauthorized: false }, ssl, opts),
         cb
       );
     } else {

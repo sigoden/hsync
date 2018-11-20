@@ -4,7 +4,6 @@ const fs = require("fs");
 module.exports = watcher => {
   return (req, res) => {
     const { args } = url.parse(req.url, true).query;
-    console.log(args);
     try {
       const { name, segs } = JSON.parse(args);
       const file = watcher.resolveFile(name, segs);
