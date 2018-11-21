@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 module.exports = connection => {
   const { host, port, ssl } = connection;
   return (name, segs, cb) => {

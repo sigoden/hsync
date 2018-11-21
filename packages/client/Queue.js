@@ -3,6 +3,7 @@ const mkdirp = require("mkdirp");
 const fs = require("fs");
 const rimraf = require("rimraf");
 const { EventEmitter } = require("events");
+const log = require("npmlog");
 
 class Queue extends EventEmitter {
   constructor(name, config, downloader) {
@@ -64,10 +65,12 @@ class Queue extends EventEmitter {
     const exec = cb => {
       switch (action) {
         case "addDir":
+          log.verbose("action", `mkdir ${absPath}`);
           mkdirp(absPath, cb);
           break;
         case "unlink":
         case "unlinkDir":
+          log.verbose("action", `rm ${absPath}`);
           rimraf(absPath, cb);
           break;
         case "change":
@@ -79,6 +82,7 @@ class Queue extends EventEmitter {
               raw += chunk;
             });
             res.on("end", () => {
+              log.verbose("action", `download ${absPath}`);
               fs.writeFile(absPath, raw, cb);
             });
           });

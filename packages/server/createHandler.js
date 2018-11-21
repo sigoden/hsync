@@ -1,5 +1,6 @@
 const url = require("url");
 const fs = require("fs");
+const log = require("npmlog");
 
 module.exports = watcher => {
   return (req, res) => {
@@ -15,7 +16,9 @@ module.exports = watcher => {
         res.write(data);
         return res.end();
       });
+      log.verbose("download", `${file}`);
     } catch (err) {
+      log.warn("download", `${file} with err ${err.message}`);
       res.writeHead(404, "Not Found");
       res.write("404: File Not Found!");
       return res.end();

@@ -2,7 +2,7 @@ const resolveCerts = require("./resovleCerts");
 const createSocket = require("./createSocket");
 const createDownloader = require("./createDownloader");
 const Queue = require("./Queue");
-const debug = require("debug")("hsync:client");
+const log = require("npmlog");
 
 module.exports = config => {
   resolveCerts(config.connection);
@@ -16,7 +16,6 @@ module.exports = config => {
     bootstrap();
   });
   socket.on("sync", state => {
-    debug(`sync: ${Object.keys(state).join(",")}`);
     Object.keys(state).forEach(name => {
       const queue = new Queue(name, config.targets[name], downloader);
       queue.syncState(state[name]);
@@ -27,7 +26,7 @@ module.exports = config => {
   socket.on("change", change => {
     const { name, action, segs, info } = change;
     const queue = queues[name];
-    debug(`[${name}]: ${action} ${queue.joinSegs(segs)}`);
+    log.verbose("change", `[${name}]: ${action} ${queue.joinSegs(segs)}`);
     queue.add({ action, segs, info });
   });
   socket.on("reconect", () => {

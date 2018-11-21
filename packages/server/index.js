@@ -2,7 +2,7 @@ const Watcher = require("./Watcher");
 const pick_ = require("lodash.pick");
 const createServer = require("./createServer");
 const createHandler = require("./createHandler");
-const debug = require("debug")("hsync:server");
+const log = require("npmlog");
 
 module.exports = config => {
   const { host, port } = config.connection;
@@ -12,7 +12,7 @@ module.exports = config => {
 
   watcher.on("change", change => {
     const { name, action, segs } = change;
-    debug(`[${name}]: ${action} ${watcher.joinSegs(segs)}`);
+    log.verbose("change", `[${name}]: ${action} ${watcher.joinSegs(segs)}`);
     io.to(name).emit("change", change);
   });
 
@@ -27,9 +27,11 @@ module.exports = config => {
         socket.emit("error", err);
       }
       socket.emit("sync", pick_(watcher.getState(), names));
+      log.info("client", `watching ${names.join(",")}`);
     });
   });
 
   server.listen(port, host);
+  log.info("server", `listening on ${host}:${port}`);
   return { server, io };
 };

@@ -4,6 +4,7 @@ const path = require("path");
 const difference_ = require("lodash.difference");
 const set_ = require("lodash.set");
 const unset_ = require("lodash.unset");
+const log = require("npmlog");
 
 const DIR_CHILDREN = "children";
 
@@ -17,6 +18,7 @@ class Watcher extends EventEmitter {
       this.names.push(name);
       this.state[name] = { info: {}, [DIR_CHILDREN]: {} };
       const { target, ignored } = targets[name];
+      log.info("watch", `[${name}] ${target}`);
       const watcher = chokidar.watch(target, {
         ignored
       });
