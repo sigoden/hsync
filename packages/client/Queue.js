@@ -63,11 +63,16 @@ class Queue extends EventEmitter {
   _mapFn(change) {
     const { action, segs, info } = change;
     const absPath = this._absPath(segs);
+    const mode = info.mode ? info.mode & parseInt("777", 8) : 0;
     const exec = cb => {
       switch (action) {
         case "addDir":
           log.verbose("action", `mkdir ${absPath}`);
-          mkdirp(absPath, cb);
+          mkdirp(absPath, err => {
+            if (err) return cb(err);
+            if (!mode) return cb();
+            fs.chmod(absPath, mode, cb);
+          });
           break;
         case "unlink":
         case "unlinkDir":
@@ -84,7 +89,11 @@ class Queue extends EventEmitter {
             });
             res.on("end", () => {
               log.verbose("action", `download ${absPath}`);
-              fs.writeFile(absPath, raw, cb);
+              fs.writeFile(absPath, raw, err => {
+                if (err) return cb(err);
+                if (!mode) return cb();
+                fs.chmod(absPath, mode, cb);
+              });
             });
           });
       }
