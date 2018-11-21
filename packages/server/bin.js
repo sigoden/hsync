@@ -24,6 +24,7 @@ const argv = require("yargs").options({
 const config = require(path.resolve(argv.config));
 
 log.level = argv.verbose ? "verbose" : argv.silent ? "error" : "info";
+log.stream = process.stdout;
 
 try {
   const { io } = initServer(config);
