@@ -3,17 +3,17 @@
     "host": "localhost",
     "port": 4444,
     "ssl": {
-      "ca": "./tmp/ssl/ca.crt",
-      "cert": "./tmp/ssl/server.crt",
-      "key": "./tmp/ssl/server.key"
+      "ca": "ssl/ca.crt",
+      "cert": "ssl/server.crt",
+      "key": "ssl/server.key"
     }
   },
   "targets": {
-    "nameA": {
-      "target": "./tmp/disk/a"
+    "diskA": {
+      "target": "/tmp/diskA"
     },
-    "nameB": {
-      "target": "./tmp/disk/b",
+    "diskB": {
+      "target": "/tmp/diskB",
       "ignored": ["node_modules/**"]
     }
   }

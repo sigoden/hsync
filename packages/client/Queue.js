@@ -13,6 +13,7 @@ class Queue extends EventEmitter {
     this.downloader = downloader;
     this.queue = [];
     this.index = 0;
+    log.info("watch", `[${name}] ${config.target}`);
   }
   syncState(state) {
     this.index = 0;

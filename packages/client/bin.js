@@ -22,7 +22,7 @@ const argv = require("yargs").options({
 
 const config = require(path.resolve(argv.config));
 
-log.level = argv.verbose ? "verbose" : argv.silent ? "error" : "warn";
+log.level = argv.verbose ? "verbose" : argv.silent ? "error" : "info";
 
 const socket = initClient(config);
 

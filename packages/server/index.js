@@ -1,10 +1,13 @@
-const Watcher = require("./Watcher");
 const pick_ = require("lodash.pick");
-const createServer = require("./createServer");
-const createHandler = require("./createHandler");
 const log = require("npmlog");
 
+const Watcher = require("./Watcher");
+const createServer = require("./createServer");
+const createHandler = require("./createHandler");
+const verifyConfig = require("./verifyConfig");
+
 module.exports = config => {
+  verifyConfig(config);
   const { host, port } = config.connection;
   const watcher = new Watcher(config.targets);
   const server = createServer(config.connection, createHandler(watcher));
@@ -27,7 +30,7 @@ module.exports = config => {
         socket.emit("error", err);
       }
       socket.emit("sync", pick_(watcher.getState(), names));
-      log.info("client", `watching ${names.join(",")}`);
+      log.info("client", `connect ${names.join(",")}`);
     });
   });
 

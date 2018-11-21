@@ -1,10 +1,13 @@
+const log = require("npmlog");
+
 const resolveCerts = require("./resovleCerts");
 const createSocket = require("./createSocket");
 const createDownloader = require("./createDownloader");
 const Queue = require("./Queue");
-const log = require("npmlog");
+const verifyConfig = require("./verifyConfig");
 
 module.exports = config => {
+  verifyConfig(config);
   resolveCerts(config.connection);
   const socket = createSocket(config.connection);
   const downloader = createDownloader(config.connection);

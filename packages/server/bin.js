@@ -22,10 +22,13 @@ const argv = require("yargs").options({
 
 const config = require(path.resolve(argv.config));
 
-log.level = argv.verbose ? "verbose" : argv.silent ? "error" : "warn";
+log.level = argv.verbose ? "verbose" : argv.silent ? "error" : "info";
 
-const { io } = initServer(config);
-
-io.on("error", err => {
-  log.error("socket", err.message);
-});
+try {
+  const { io } = initServer(config);
+  io.on("error", err => {
+    log.error("socket", err.message);
+  });
+} catch (err) {
+  log.error("hsync", err.message);
+}

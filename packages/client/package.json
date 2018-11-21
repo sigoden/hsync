@@ -6,13 +6,18 @@
   "bin": {
     "hsync": "bin.js"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "publishConfig": {
+    "access": "public"
   },
-  "keywords": [],
+  "scripts": {},
+  "keywords": [
+    "sync",
+    "filesync"
+  ],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
   "license": "MIT",
   "dependencies": {
+    "ajv": "^6.5.5",
     "mkdirp": "^0.5.1",
     "npmlog": "^4.1.2",
     "rimraf": "^2.6.2",

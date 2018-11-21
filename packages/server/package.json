@@ -6,13 +6,15 @@
   "bin": {
     "hsyncd": "bin.js"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "publishConfig": {
+    "access": "public"
   },
-  "keywords": [],
+  "scripts": {},
+  "keywords": ["sync", "filesync"],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
   "license": "MIT",
   "dependencies": {
+    "ajv": "^6.5.5",
     "chokidar": "^2.0.4",
     "lodash.difference": "^4.5.0",
     "lodash.pick": "^4.4.0",
