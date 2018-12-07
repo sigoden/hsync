@@ -1,6 +1,7 @@
 const path = require("path");
 const mkdirp = require("mkdirp");
 const fs = require("fs");
+const { Transform } = require("stream");
 const rimraf = require("rimraf");
 const { EventEmitter } = require("events");
 const log = require("npmlog");
@@ -82,14 +83,14 @@ class Queue extends EventEmitter {
         case "change":
         case "add":
           this.downloader(this.name, segs, function(res) {
-            let raw = "";
+            const raw = new Transform();
             res.on("error", err => cb(err));
             res.on("data", chunk => {
-              raw += chunk;
+              raw.push(chunk);
             });
             res.on("end", () => {
               log.verbose("action", `download ${absPath}`);
-              fs.writeFile(absPath, raw, err => {
+              fs.writeFile(absPath, raw.read(), err => {
                 if (err) return cb(err);
                 if (!mode) return cb();
                 fs.chmod(absPath, mode, cb);
